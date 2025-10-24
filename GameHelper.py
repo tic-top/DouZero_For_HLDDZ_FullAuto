@@ -154,9 +154,7 @@ class GameHelper:
         st = time.time()
         self.Handle = win32gui.FindWindow("UnityWndClass", None)
         self.Interrupt = False
-        self.BaseShape = (1440, 810)
-        self.current_rect = (0, 0, 1440, 810)
-        self.CurrentShape = (1440, 810)
+        self.BaseShape = (1292, 804)
         self.GetZoomRate()
         for file in os.listdir("./pics"):
             info = file.split(".")
@@ -171,7 +169,7 @@ class GameHelper:
         while self.counter.elapsed() < ms:
             QtWidgets.QApplication.processEvents(QEventLoop.AllEvents, 50)
 
-    def Screenshot(self, region=None):  # -> (im, (left, top))
+    def Screenshot(self):  # -> (im, (left, top))
         try_count = 3
         success = False
         while try_count > 0 and not success:
@@ -183,8 +181,6 @@ class GameHelper:
                 left, top, right, bot = win32gui.GetClientRect(hwnd)
                 width = right - left
                 height = bot - top
-                self.current_rect = (left, top, width, height)
-                self.CurrentShape = (width, height)
                 width = int(width)
                 height = int(height)
                 hwndDC = win32gui.GetWindowDC(hwnd)
@@ -204,8 +200,6 @@ class GameHelper:
                 saveDC.DeleteDC()
                 mfcDC.DeleteDC()
                 win32gui.ReleaseDC(hwnd, hwndDC)
-                if region is not None:
-                    im = im.crop((region[0], region[1], region[0] + region[2], region[1] + region[3]))
                 if result:
                     success = True
                     return im, (left, top)
@@ -238,11 +232,14 @@ class GameHelper:
             # print(result)
 
     def LeftClick(self, pos):
-        x = int((pos[0] / self.BaseShape[0]) * self.CurrentShape[0])
-        y = int((pos[1] / self.BaseShape[1]) * self.CurrentShape[1])
+        # 这个position是相对于self.BaseShape的
+        # 我们点击的时候，要基于当前大小做调整
+        left, top, right, bottom = win32gui.GetWindowRect(self.Handle)
+        x = int((pos[0] / self.BaseShape[0]) * (right - left))
+        y = int((pos[1] / self.BaseShape[1]) * (bottom - top))
         m, n = int(self.current_rect[0] + x), int(self.current_rect[1] + y)
         client_pos = (x, y)
-        win32api.SetCursorPos((m, n))
+        win32api.SetCursorPos((m, n)) # 装装样子
         tmp = win32api.MAKELONG(client_pos[0], client_pos[1])
         win32gui.PostMessage(self.Handle, win32con.WM_ACTIVATE, win32con.WA_ACTIVE, 0)
         win32gui.SendMessage(self.Handle, win32con.WM_LBUTTONDOWN, win32con.MK_LBUTTON, tmp)
@@ -251,8 +248,10 @@ class GameHelper:
         # win32api.SetCursorPos((int(self.current_rect[0] + 1000), int(self.current_rect[1] + 550))) # 避免干扰识别
 
     def MoveTo(self, pos):
-        x = int((pos[0] / self.BaseShape[0]) * self.CurrentShape[0])
-        y = int((pos[1] / self.BaseShape[1]) * self.CurrentShape[1])
+        # 这个position是相对于self.BaseShape的
+        left, top, right, bottom = win32gui.GetWindowRect(self.Handle)
+        x = int((pos[0] / self.BaseShape[0]) * (right - left))
+        y = int((pos[1] / self.BaseShape[1]) * (bottom - top))
         x, y = int(self.current_rect[0] + x), int(self.current_rect[1] + y)
         pyautogui.moveTo(x, y)
 
