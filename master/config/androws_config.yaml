@@ -1,0 +1,105 @@
+# Androws 欢乐斗地主配置
+# 这是针对你的游戏窗口的专用配置
+
+# 游戏窗口配置
+game:
+  window_class: "Qt5152QWindowIcon"  # ← 正确的类名
+  window_title: "欢乐斗地主"
+  target_resolution:
+    width: 622   # ← 你的实际窗口大小
+    height: 389
+
+# 模板图片路径
+templates:
+  base_path: "pics"  # 修正：pics 在项目根目录，不是上一级
+  my_cards: "m"
+  other_cards: "o"
+  center_cards: "c"
+  bottom_cards: "z"
+
+# 屏幕区域配置（需要重新标定，因为分辨率不同）
+# 基准分辨率改为 622x389
+regions:
+  base_resolution: [622, 389]
+
+  # 以下坐标需要根据 622x389 的窗口重新调整
+  # 先用原始比例缩放，然后运行 debug_screenshot.py 查看是否正确
+
+  # 原始 1440x810 的坐标按比例缩放到 622x389
+  # 缩放比例: x方向 = 622/1440 = 0.432, y方向 = 389/810 = 0.48
+
+  my_hand_cards: [78, 269, 453, 43]      # 原始: [180, 560, 1050, 90]
+  left_played_cards: [138, 134, 173, 58]  # 原始: [320, 280, 400, 120]
+  right_played_cards: [311, 134, 173, 58] # 原始: [720, 280, 400, 120]
+  my_played_cards: [130, 168, 346, 48]    # 原始: [300, 350, 800, 100]
+  landlord_cards: [259, 16, 95, 49]       # 原始: [600, 33, 220, 103]
+
+  # 按钮区域
+  pass_button: [86, 216, 432, 58]         # 原始: [200, 450, 1000, 120]
+  general_button: [86, 216, 432, 58]      # 原始: [200, 450, 1000, 120]
+  start_button: [475, 296, 86, 36]        # 原始: [1100, 617, 200, 74]
+
+  # 地主标志位置（需要重新标定）
+  landlord_flags:
+    - [539, 118, 21, 25]  # 右边玩家，原始: [1247, 245, 48, 52]
+    - [5, 317, 22, 25]    # 自己，原始: [12, 661, 51, 53]
+    - [53, 117, 22, 26]   # 左边玩家，原始: [123, 243, 52, 54]
+
+  # 聊天图标（重要！用于判断是否进入游戏）
+  # 需要运行 debug_screenshot.py 来找到准确位置
+  chat_icon: [563, 357, 51, 27]  # 原始: [1302, 744, 117, 56]
+
+# AI 决策阈值（保持不变）
+thresholds:
+  bidding:
+    call_landlord: 0.2
+    steal_landlord_1: 0.4
+    steal_landlord_2: 0.5
+
+  doubling:
+    landlord_stole_1: 0.5
+    landlord_stole_2: 0.4
+    landlord_not_stole_1: 0.6
+    landlord_not_stole_2: 0.5
+    farmer_high: 1.3
+    farmer_medium: 1.1
+    farmer_low: 1.2
+    farmer_very_low: 1.0
+
+  show_cards: 1.5
+
+# 模型配置（保持不变）
+models:
+  douzero:
+    type: "resnet"
+    landlord: "baselines/resnet/resnet_landlord.ckpt"
+    landlord_up: "baselines/resnet/resnet_landlord_up.ckpt"
+    landlord_down: "baselines/resnet/resnet_landlord_down.ckpt"
+
+  bidding:
+    path: "weights/bid_weights.pkl"
+
+  scoring:
+    landlord: "weights/landlord_weights.pkl"
+    farmer: "weights/farmer_weights.pkl"
+    landlord_up: "weights/landlord_up_weights.pkl"
+    landlord_down: "weights/landlord_down_weights.pkl"
+
+# 图像识别配置
+detection:
+  confidence: 0.7  # 降低置信度，提高识别率
+  card_spacing: 19.7  # 按比例缩放: 45.6 * 0.432 ≈ 19.7
+  retry_times: 3
+  retry_delay: 0.1
+
+# 动作执行配置
+actions:
+  click_delay: 0.05
+  animation_wait: 0.3
+  verification_enabled: true
+
+# 日志配置
+logging:
+  level: "INFO"
+  file: "logs/agent.log"
+  console: true
