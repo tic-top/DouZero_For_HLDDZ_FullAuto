@@ -175,14 +175,12 @@ class GameHelper:
         while try_count > 0 and not success:
             try:
                 try_count -= 1
-                self.Handle = win32gui.FindWindow("UnityWndClass", None)
+                self.Handle = win32gui.FindWindow(None, "腾讯欢乐斗地主")
                 win32gui.SetActiveWindow(self.Handle)
                 hwnd = self.Handle
                 left, top, right, bot = win32gui.GetWindowRect(hwnd)
-                # 调整窗口大小
-                win32gui.MoveWindow(hwnd, left, top, 1440, 810, True)
-                width = 1440
-                height = 810
+                width = right - left
+                height = bot - top
                 self.RealRate = (width, height)
                 width = int(width)
                 height = int(height)
@@ -203,7 +201,6 @@ class GameHelper:
                 saveDC.DeleteDC()
                 mfcDC.DeleteDC()
                 win32gui.ReleaseDC(hwnd, hwndDC)
-                im = im.resize((1440, 810))
                 if region is not None:
                     im = im.crop((region[0], region[1], region[0] + region[2], region[1] + region[3]))
                 if result:
