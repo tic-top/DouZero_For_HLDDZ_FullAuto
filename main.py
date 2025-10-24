@@ -5,7 +5,7 @@
 # @Software: PyCharm
 
 import GameHelper as gh
-from GameHelper import GameHelper, play_sound, read_json, write_json
+from GameHelper import GameHelper, read_json, write_json
 import sys
 import json
 import time
@@ -857,7 +857,6 @@ class Worker(QThread):
 
                     if not self.auto_sign:
                         print("现在是手动模式，请手动出牌")
-                        play_sound("music/1.wav")
                         if action_message["action"] == "":
                             self.pre_cards_display.emit("推荐：pass")
                         else:
@@ -1069,25 +1068,25 @@ class Worker(QThread):
         return cards_real
 
     def find_my_cards(self):
-        img, _ = helper.Screenshot()
+        img, _ = helper.Screenshot(use_imagegrab=True)
         img = cv2.cvtColor(np.asarray(img), cv2.COLOR_RGB2BGR)
         my_cards_real = self.find_cards(img, self.MyHandCardsPos, mark="m")
         return my_cards_real
 
     def find_other_cards(self, pos):
-        img, _ = helper.Screenshot()
+        img, _ = helper.Screenshot(use_imagegrab=True)
         img = cv2.cvtColor(np.asarray(img), cv2.COLOR_RGB2BGR)
         other_cards_real = self.find_cards(img, pos, mark="o")
         return other_cards_real
 
     def find_played_cards(self, pos):
-        img, _ = helper.Screenshot()
+        img, _ = helper.Screenshot(use_imagegrab=True)
         img = cv2.cvtColor(np.asarray(img), cv2.COLOR_RGB2BGR)
         other_cards_real = self.find_cards(img, pos, mark="c")
         return other_cards_real
 
     def find_three_cards(self):
-        img, _ = helper.Screenshot()
+        img, _ = helper.Screenshot(use_imagegrab=True)
         img = cv2.cvtColor(np.asarray(img), cv2.COLOR_RGB2BGR)
         landlord__cards_real = self.find_cards(img, self.LandlordCardsPos, mark="z")
         return landlord__cards_real
@@ -1131,7 +1130,7 @@ class Worker(QThread):
 
                     # print("准备点击的牌：", cards_dict[i])
                     point = cars_pos[0] + 20, cars_pos[1] + 100
-                    img, _ = helper.Screenshot()
+                    img, _ = helper.Screenshot(use_imagegrab=True)
                     img = cv2.cvtColor(np.asarray(img), cv2.COLOR_RGB2BGR)
                     check_one = self.find_cards(img=img, pos=(cars_pos[0] - 2, 565, 60, 60), mark="m", confidence=0.8)
                     # print("系统帮你点的牌：", check_one, "你要出的牌：", i)
@@ -1146,7 +1145,7 @@ class Worker(QThread):
                     remove_dict[i].append(cards_dict[i][-1])
                     cards_dict[i].remove(cards_dict[i][-1])
                     # print("remove_dict", remove_dict)
-                img, _ = helper.Screenshot()
+                img, _ = helper.Screenshot(use_imagegrab=True)
                 img = cv2.cvtColor(np.asarray(img), cv2.COLOR_RGB2BGR)
                 check_cards = self.find_cards(img, (180, 590, 1050, 90), mark="m")
                 for i in out_cards:
@@ -1215,11 +1214,11 @@ class Worker(QThread):
             (485, 160, 485 + 20, 160 + 20),  # 上家动画位置
             (700, 400, 700 + 20, 400 + 20),  # 自己上方动画位置
         ]
-        img, _ = helper.Screenshot()
+        img, _ = helper.Screenshot(use_imagegrab=True)
         lastImg = img
         for i in range(2):
             time.sleep(waitTime)
-            img, _ = helper.Screenshot()
+            img, _ = helper.Screenshot(use_imagegrab=True)
             for region in regions:
                 if compareImage(img.crop(region), lastImg.crop(region)):
                     return True
@@ -1237,7 +1236,6 @@ class MyPyQT_Form(QtWidgets.QWidget, Ui_Form):
                             QtCore.Qt.WindowCloseButtonHint)
         self.setWindowIcon(QIcon(':/pics/favicon.ico'))
         self.setWindowTitle("DouZero欢乐斗地主  v5.7")
-        play_sound("music/2.wav")
         self.setFixedSize(self.width(), self.height())  # 固定窗体大小
         self.move(20, 20)
         window_pale = QtGui.QPalette()
@@ -1411,9 +1409,5 @@ class MyPyQT_Form(QtWidgets.QWidget, Ui_Form):
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
     main = MyPyQT_Form()
-    style_file = QFile("style.qss")
-    stream = QTextStream(style_file)
-    style_sheet = stream.readAll()
-    main.setStyleSheet(style_sheet)
     main.show()
     sys.exit(app.exec_())
