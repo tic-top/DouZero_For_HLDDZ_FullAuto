@@ -178,7 +178,7 @@ class GameHelper:
                 self.Handle = win32gui.FindWindow(None, "腾讯欢乐斗地主")
                 win32gui.SetActiveWindow(self.Handle)
                 hwnd = self.Handle
-                left, top, right, bot = win32gui.GetWindowRect(hwnd)
+                left, top, right, bot = win32gui.GetClientRect(hwnd)
                 width = right - left
                 height = bot - top
                 self.RealRate = (width, height)
